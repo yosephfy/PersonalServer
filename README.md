@@ -16,8 +16,11 @@ API Examples (curl)
 - Ping:
   - `curl http://127.0.0.1:8080/ping`
 
-- Run command:
+- Run command (single):
   - `curl -X POST http://127.0.0.1:8080/run -H 'Content-Type: application/json' -d '{"cmd":"ls -la"}'`
+
+- Run commands (multiple, sequential):
+  - `curl -X POST http://127.0.0.1:8080/run -H 'Content-Type: application/json' -d '{"cmds":["pwd","ls -la","echo done"],"stop_on_error":false}'`
 
 - Add note:
   - `curl -X POST http://127.0.0.1:8080/notes -H 'Content-Type: application/json' -d '{"title":"Idea","content":"My note body","tags":["personal","ideas"]}'`

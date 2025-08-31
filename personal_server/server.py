@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict
 
 from . import config
-from .commands import run_command
+from .commands import run_command, run_commands
 from .scraper import fetch_url, html_to_text
 from .storage import save_note, save_scrape, save_transaction, save_weight
 
@@ -31,12 +31,31 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"ok": False, "error": f"Invalid JSON: {e}"}, status=HTTPStatus.BAD_REQUEST)
 
         if self.path.startswith("/run"):
-            cmd = str(body.get("cmd") or body.get("command") or "").strip()
-            if not cmd:
-                return self._json({"ok": False, "error": "Missing 'cmd'"}, status=HTTPStatus.BAD_REQUEST)
             timeout = body.get("timeout")
             cwd = body.get("cwd")
-            result = run_command(cmd, timeout=timeout, cwd=cwd)
+
+            # Accept single string or list of commands
+            commands = None
+            if isinstance(body.get("cmds"), list):
+                commands = body.get("cmds")
+            elif isinstance(body.get("commands"), list):
+                commands = body.get("commands")
+            elif isinstance(body.get("cmd"), list):
+                commands = body.get("cmd")
+
+            if commands is not None:
+                # sequential execution of multiple commands
+                stop_on_error = bool(body.get("stop_on_error", False))
+                # coerce all entries to strings
+                commands = [str(c) for c in commands]
+                agg = run_commands(commands, timeout=timeout, cwd=cwd, stop_on_error=stop_on_error)
+                return self._json(agg)
+
+            # Fallback: single command string
+            cmd = body.get("cmd") or body.get("command")
+            if not cmd or not str(cmd).strip():
+                return self._json({"ok": False, "error": "Missing 'cmd' or 'cmds'"}, status=HTTPStatus.BAD_REQUEST)
+            result = run_command(str(cmd), timeout=timeout, cwd=cwd)
             return self._json(result)
 
         if self.path.startswith("/notes"):
