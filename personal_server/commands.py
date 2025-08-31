@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import shlex
 import subprocess
 import time
-from pathlib import Path
 from typing import Dict, Optional, List
 
 
@@ -12,7 +10,7 @@ def run_command(cmd: str, timeout: Optional[int] = None, cwd: Optional[str] = No
     try:
         # Run in shell for parity with bash usage, return combined results
         proc = subprocess.run(
-            cmd,
+            str(cmd),
             shell=True,
             capture_output=True,
             text=True,
@@ -34,6 +32,15 @@ def run_command(cmd: str, timeout: Optional[int] = None, cwd: Optional[str] = No
             "code": None,
             "stdout": e.stdout or "",
             "stderr": (e.stderr or "") + "\nTIMEOUT",
+            "duration_sec": round(duration, 4),
+        }
+    except Exception as e:
+        duration = time.time() - start
+        return {
+            "ok": False,
+            "code": None,
+            "stdout": "",
+            "stderr": f"ERROR: {e}",
             "duration_sec": round(duration, 4),
         }
 
@@ -60,12 +67,3 @@ def run_commands(cmds: List[str], timeout: Optional[int] = None, cwd: Optional[s
         "stopped": stopped,
         "results": results,
     }
-    except Exception as e:
-        duration = time.time() - start
-        return {
-            "ok": False,
-            "code": None,
-            "stdout": "",
-            "stderr": f"ERROR: {e}",
-            "duration_sec": round(duration, 4),
-        }
