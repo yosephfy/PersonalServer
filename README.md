@@ -22,6 +22,9 @@ API Examples (curl)
 - Run commands (multiple, sequential):
   - `curl -X POST http://127.0.0.1:8080/run -H 'Content-Type: application/json' -d '{"cmds":["pwd","ls -la","echo done"],"stop_on_error":false}'`
 
+- Run commands in single shell (preserve env and cd):
+  - `curl -X POST http://127.0.0.1:8080/run -H 'Content-Type: application/json' -d '{"cmds":["pwd","cd ..","export FOO=bar","echo $FOO"],"single_shell":true}'`
+
 - Add note:
   - `curl -X POST http://127.0.0.1:8080/notes -H 'Content-Type: application/json' -d '{"title":"Idea","content":"My note body","tags":["personal","ideas"]}'`
 

@@ -6,7 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict
 
 from . import config
-from .commands import run_command, run_commands
+from .commands import run_command, run_commands, run_commands_single_shell
 from .scraper import fetch_url, html_to_text
 from .storage import save_note, save_scrape, save_transaction, save_weight
 
@@ -48,7 +48,10 @@ class Handler(BaseHTTPRequestHandler):
                 stop_on_error = bool(body.get("stop_on_error", False))
                 # coerce all entries to strings
                 commands = [str(c) for c in commands]
-                agg = run_commands(commands, timeout=timeout, cwd=cwd, stop_on_error=stop_on_error)
+                if bool(body.get("single_shell", False)):
+                    agg = run_commands_single_shell(commands, timeout=timeout, cwd=cwd, stop_on_error=stop_on_error)
+                else:
+                    agg = run_commands(commands, timeout=timeout, cwd=cwd, stop_on_error=stop_on_error)
                 return self._json(agg)
 
             # Fallback: single command string
