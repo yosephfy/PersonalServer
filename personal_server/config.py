@@ -4,7 +4,8 @@ import os
 from pathlib import Path
 
 
-ROOT = Path(os.getenv("PERSONAL_SERVER_ROOT", Path(__file__).resolve().parent.parent))
+ROOT = Path(os.getenv("PERSONAL_SERVER_ROOT",
+            Path(__file__).resolve().parent.parent))
 
 DATA_DIR = ROOT
 
@@ -18,5 +19,5 @@ TRANSACTIONS_CSV = TRANSACTIONS_DIR / "transactions.csv"
 SCRAPES_CSV = SCRAPES_DIR / "scrapes.csv"
 WEIGHTS_CSV = WEIGHTS_DIR / "weights.csv"
 
-DEFAULT_HOST = os.getenv("PERSONAL_SERVER_HOST", "127.0.0.1")
-DEFAULT_PORT = int(os.getenv("PERSONAL_SERVER_PORT", "8080"))
+DEFAULT_HOST = os.getenv("PERSONAL_SERVER_HOST", "192.168.1.171")
+DEFAULT_PORT = int(os.getenv("PERSONAL_SERVER_PORT", "9000"))
